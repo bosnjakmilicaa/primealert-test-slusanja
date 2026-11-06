@@ -126,8 +126,8 @@ function renderUvod(){
   app.innerHTML = `<div class="card"><h1>Test slušanja</h1>
   <p class="mut">Projekat PrimeAlert · Katedra za telekomunikacije i obradu signala, Fakultet tehničkih nauka, Novi Sad</p>
   <p>Throat mikrofon se nosi na vratu i snima vibracije grla, pa govor zvuči drugačije nego sa običnim mikrofonom. Razvili smo nekoliko metoda koje od običnog snimka prave zvuk „kao sa throat mikrofona”. Vaš zadatak je da procenite koliko svaka verzija zvuči slično pravom throat snimku.</p>
-  <div class="steps"><span>1</span><span>Provera slušalica i kratak uvod</span><span>2</span><span>Deo A — izbor sličnijeg snimka (26 primera)</span><span>3</span><span>Deo B — ocena sličnosti od 0 do 100 (10 primera)</span></div>
-  <ul><li><b>Trajanje:</b> oko 25–30 minuta.</li><li><b>Potrebno:</b> slušalice i tiha prostorija.</li><li>Rečenice su na francuskom — razumevanje nije važno.</li><li>Nema tačnih ni pogrešnih odgovora; svaki snimak možete preslušati više puta.</li><li>Ako prekinete, napredak ostaje sačuvan na ovom uređaju.</li></ul>
+  <div class="steps"><span>1</span><span>Kratak uvod</span><span>2</span><span>Deo A — izbor sličnijeg snimka (26 primera)</span><span>3</span><span>Deo B — ocena sličnosti od 0 do 100 (10 primera)</span></div>
+  <ul><li><b>Trajanje:</b> oko 25–30 minuta.</li><li><b>Preporuka:</b> slušalice i tiha prostorija, ali može i preko zvučnika telefona ili računara.</li><li>Rečenice su na francuskom — razumevanje nije važno.</li><li>Nema tačnih ni pogrešnih odgovora; svaki snimak možete preslušati više puta.</li><li>Ako prekinete, napredak ostaje sačuvan na ovom uređaju.</li></ul>
   <p class="mut">Učešće je dobrovoljno i možete odustati u bilo kom trenutku. Odgovori se koriste isključivo u istraživačke svrhe; u analizi i publikacijama učesnici su anonimni.</p>
   <label class="chk"><input type="checkbox" id="sg"><span>Pročitao/la sam opis i pristajem da učestvujem.</span></label>
   <button class="btn" id="nx" disabled>Započni</button></div>`;
@@ -138,13 +138,13 @@ function renderPodaci(){
   hdr("Podaci o slušaocu",0);
   app.innerHTML = `<div class="card"><h2>Podaci o slušaocu</h2>
   <div class="field"><label for="ip">Ime i prezime</label><input type="text" id="ip" autocomplete="name" placeholder="npr. Ana Petrović"></div>
-  <div class="field"><label for="sl">Na čemu slušate?</label><select id="sl"><option value="">— izaberite —</option><option value="bubice">Bubice (u uvu)</option><option value="preko_usiju">Slušalice preko ušiju</option><option value="bez">Nemam slušalice</option></select></div>
+  <div class="field"><label for="sl">Na čemu slušate?</label><select id="sl"><option value="">— izaberite —</option><option value="bubice">Bubice (u uvu)</option><option value="preko_usiju">Slušalice preko ušiju</option><option value="zvucnik">Zvučnik (telefon ili računar)</option></select></div>
   <div id="slw"></div>
   <div class="field"><label for="is">Iskustvo sa obradom zvuka ili govora</label><select id="is"><option value="">— izaberite —</option><option value="nema">Nemam</option><option value="nesto">Nešto (studije, hobi)</option><option value="strucno">Stručno</option></select></div>
   <button class="btn" id="nx" disabled>Nastavi</button></div>`;
   const chk = () => { const okIme = /\S+\s+\S+/.test($("ip").value.trim()), sl = $("sl").value;
-    $("slw").innerHTML = sl === "bez" ? `<div class="note">Za ovaj test su potrebne slušalice — razlike između snimaka se na zvučniku telefona ne čuju.</div>` : "";
-    $("nx").disabled = !(okIme && sl && sl !== "bez" && $("is").value); };
+    $("slw").innerHTML = sl === "zvucnik" ? `<div class="note">Može i preko zvučnika. Slušajte u tihoj prostoriji, a ako možete, pojačajte zvuk tako da jasno čujete razlike.</div>` : "";
+    $("nx").disabled = !(okIme && sl && $("is").value); };
   ["ip","sl","is"].forEach(id => { $(id).oninput = chk; $(id).onchange = chk; });
   if (S.meta.ime_prezime) $("ip").value = S.meta.ime_prezime;
   $("nx").onclick = () => { S.meta.ime_prezime = $("ip").value.trim().replace(/\s+/g, " "); S.meta.slusalice = $("sl").value; S.meta.iskustvo = $("is").value;
@@ -155,7 +155,7 @@ async function renderUcitavanje(){
   hdr("Priprema",0);
   app.innerHTML = `<div class="card okbox"><div class="spin"></div><h2>Učitavanje snimaka</h2><p class="mut" id="pp">0 %</p><p class="mut">Preporučuje se Wi-Fi (oko 14 MB).</p></div>`;
   try { await preload((n,N) => { const e = $("pp"); if (e) e.textContent = Math.round(100*n/N) + " %"; });
-    const t = NAKON; NAKON = null; if (t) { S.pos = t; save(); route(); } else go("lr"); }
+    const t = NAKON; NAKON = null; if (t) { S.pos = t; save(); route(); } else go(S.meta.slusalice === "zvucnik" ? "trening" : "lr"); }
   catch(e){ app.innerHTML = `<div class="card"><h2>Snimci se nisu učitali</h2><div class="note">Proverite internet vezu i pokušajte ponovo.</div><button class="btn" id="rt">Pokušaj ponovo</button></div>`; $("rt").onclick = () => renderUcitavanje(); }
 }
 function renderLR(){
